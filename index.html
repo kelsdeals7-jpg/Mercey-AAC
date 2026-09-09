@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mercey AAC</title>
+    <link rel="icon" href="data:,">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Mercey%20AAC%22%2C%22short_name%22%3A%22AAC%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230f172a%22%2C%22theme_color%22%3A%22%230f172a%22%7D">
+
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --text-main: #111827;
+            
+            /* Colors */
+            --c-choo: #a7f3d0;      --c-maji: #bae6fd;      --c-chakula: #fde047;   
+            --c-inatosha: #fca5a5;  --c-ndiyo: #86efac;     --c-hapana: #fda4af;    
+            --c-nimechoka: #d8b4fe; --c-asante: #fbcfe8;    --c-time: #fef08a;
+            
+            /* Health Colors */
+            --c-pain: #f87171;      --c-joto: #fdba74;      --c-baridi: #93c5fd;
+            
+            /* Social Colors */
+            --c-chat: #99f6e4;      --c-happy: #a7f3d0;     --c-play: #e9d5ff;      
+            
+            /* High-Vis Navigation Colors */
+            --c-nav-afya: #facc15;     
+            --c-nav-maongezi: #22d3ee; 
+            --c-nav-nyuma: #f97316;    
+            --c-nav-mwanzo: #a3e635;   
+        }
+
+        /* 
+         * iPAD TOUCH OPTIMIZATIONS 
+         * -webkit-touch-callout prevents the magnifying glass/copy popup on long-press
+         * touch-action: manipulation removes the native 300ms tap delay
+         */
+        * {
+            box-sizing: border-box; margin: 0; padding: 0;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            user-select: none; -webkit-user-select: none;
+            -webkit-touch-callout: none; 
+            touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            height: 100vh; width: 100vw;
+            display: flex; flex-direction: column;
+            padding: 15px 3vw;
+            overflow: hidden;
+        }
+
+        /* ----------------------------------
+           LOCKED ALERT-FIRST SCREEN 
+           ---------------------------------- */
+        .locked-container {
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            height: 100%; width: 100%;
+        }
+        .locked-title {
+            color: white; margin-bottom: 40px; font-size: 3.5rem; text-align: center;
+            font-weight: 900; letter-spacing: 2px;
+        }
+        .giant-alert-btn {
+            width: 65vw; height: 65vw; max-width: 350px; max-height: 350px; 
+            border-radius: 50%; background-color: #e11d48; border: 8px solid #fff; 
+            box-shadow: 0 10px 30px rgba(225, 29, 72, 0.6); 
+            display: flex; justify-content: center; align-items: center; 
+            cursor: pointer; animation: pulseGiant 2s infinite;
+            transition: transform 0.1s;
+        }
+        .giant-alert-btn:active { transform: scale(0.95); }
+        .giant-alert-btn img {
+            width: 50%; height: 50%; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
+            pointer-events: none;
+        }
+        .locked-subtitle {
+            color: #94a3b8; margin-top: 40px; font-size: 1.8rem; text-align: center;
+            font-weight: 800;
+        }
+        @keyframes pulseGiant {
+            0% { box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.7); transform: scale(1); }
+            50% { transform: scale(1.02); }
+            70% { box-shadow: 0 0 0 40px rgba(225, 29, 72, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(225, 29, 72, 0); transform: scale(1); }
+        }
+
+        /* ----------------------------------
+           MAIN APP CONTENT 
+           ---------------------------------- */
+        .app-content {
+            display: none; 
+            flex-direction: column; height: 100%; width: 100%;
+        }
+        .app-content.unlocked {
+            display: flex;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        /* Time Modifier Bar */
+        .modifier-bar {
+            display: flex; gap: 10px; margin-bottom: 12px;
+            width: 100%; height: 75px; flex-shrink: 0;
+            padding-right: 70px; 
+        }
+        
+        .btn-mod {
+            flex: 1; border-radius: 12px; border: none;
+            background-color: var(--c-time); color: var(--text-main);
+            font-weight: 900; font-size: 1.5rem;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            box-shadow: 0 4px 6px -2px rgba(0,0,0,0.3);
+            transition: transform 0.1s;
+        }
+        .btn-mod:active { transform: scale(0.95); }
+        .btn-mod img, .btn-mod span { pointer-events: none; }
+
+        /* Floating Emergency Alert Button */
+        .fab-alert {
+            position: fixed; top: 15px; right: 3vw;
+            width: 75px; height: 75px;
+            background-color: #e11d48; border: 3px solid #fff;
+            border-radius: 15px; z-index: 100;
+            display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 8px 15px rgba(225, 29, 72, 0.4);
+            animation: pulseAlertIcon 2s infinite;
+        }
+        @keyframes pulseAlertIcon {
+            0% { box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(225, 29, 72, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(225, 29, 72, 0); }
+        }
+        .fab-alert img { width: 45px; height: 45px; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3)); pointer-events: none; }
+
+        /* Main Grid Pages */
+        .page { display: none; height: 100%; width: 100%; flex: 1; }
+        .page.active {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 12px;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+
+        .btn {
+            border: 4px solid transparent; border-radius: 16px;
+            color: var(--text-main);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: transform 0.1s, filter 0.1s;
+            box-shadow: 0 8px 12px -3px rgba(0, 0, 0, 0.4);
+        }
+        .btn:active { transform: scale(0.96); filter: brightness(0.85); }
+        .btn.disabled { opacity: 0.5; pointer-events: none; }
+        .btn.speaking { border-color: #fff; transform: scale(1.02); filter: brightness(1.2); }
+
+        /* pointer-events: none ensures tap targets land perfectly on the main .btn element */
+        .btn-image { width: 70px; height: 70px; object-fit: contain; margin-bottom: 8px; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.15)); pointer-events: none; }
+        
+        .btn-label { 
+            font-size: clamp(1.5rem, 4.5vw, 2.2rem); 
+            font-weight: 900; 
+            text-align: center; 
+            line-height: 1.1; 
+            pointer-events: none;
+        }
+
+        /* High-Visibility Navigation Overrides */
+        .btn-nav { border: none; }
+        .bg-nav-afya { background-color: var(--c-nav-afya); }
+        .bg-nav-afya .btn-label { color: #000; }
+        .bg-nav-maongezi { background-color: var(--c-nav-maongezi); }
+        .bg-nav-maongezi .btn-label { color: #000; }
+        .bg-nav-nyuma { background-color: var(--c-nav-nyuma); }
+        .bg-nav-nyuma .btn-label { color: #fff; }
+        .bg-nav-mwanzo { background-color: var(--c-nav-mwanzo); }
+        .bg-nav-mwanzo .btn-label { color: #000; }
+
+        .attribution {
+            color: #64748b; text-align: center; font-size: 1rem;
+            padding: 12px 0; margin-top: auto; font-weight: bold;
+        }
+
+        /* Overlays */
+        .overlay-layer {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 9999; display: none; flex-direction: column;
+            justify-content: center; align-items: center; color: white;
+            backdrop-filter: blur(8px);
+        }
+        .overlay-layer.active { display: flex; animation: fadeIn 0.2s; }
+        
+        /* Emergency Overlay Specifics */
+        #alertOverlay { background-color: rgba(159, 18, 57, 0.95); }
+        
+        /* Caregiver Dashboard Specifics */
+        #caregiverOverlay { background-color: rgba(15, 23, 42, 0.95); padding: 20px; }
+        .dashboard-box {
+            background: white; color: black; border-radius: 20px;
+            width: 100%; max-width: 500px; height: 75vh;
+            display: flex; flex-direction: column; overflow: hidden;
+        }
+        .dash-header { background: #1e293b; color: white; padding: 15px; text-align: center; font-size: 1.5rem; font-weight: 900; }
+        .log-container { flex: 1; overflow-y: auto; padding: 15px; }
+        
+        .log-entry { padding: 10px 0; font-size: 1.2rem; font-weight: bold; border-bottom: 1px solid #f1f5f9; }
+        .log-time { color: #64748b; font-size: 1rem; display: block; margin-bottom: 2px; font-weight: normal; }
+        
+        /* Dashboard Controls */
+        .dash-controls { 
+            display: flex; flex-direction: column; gap: 10px; padding: 15px; 
+            background-color: #f8fafc; border-top: 2px solid #e2e8f0;
+        }
+        .dash-btn { 
+            width: 100%; border: none; padding: 16px; font-size: 1.3rem; 
+            font-weight: 900; color: white; border-radius: 12px; cursor: pointer; 
+        }
+        .dash-btn:active { transform: scale(0.97); }
+        .btn-lock { background: #22c55e; } 
+        .btn-close { background: #64748b; }
+        .btn-clear { background: #ef4444; }
+
+        /* General UI Classes */
+        .bg-choo { background: var(--c-choo); } .bg-maji { background: var(--c-maji); }
+        .bg-chakula { background: var(--c-chakula); } .bg-inatosha { background: var(--c-inatosha); }
+        .bg-ndiyo { background: var(--c-ndiyo); } .bg-hapana { background: var(--c-hapana); }
+        .bg-nimechoka { background: var(--c-nimechoka); } .bg-asante { background: var(--c-asante); }
+        
+        .bg-pain { background: var(--c-pain); } 
+        .bg-joto { background: var(--c-joto); } .bg-baridi { background: var(--c-baridi); }
+        
+        .bg-play { background: var(--c-play); }
+
+        @media (min-width: 768px) and (orientation: landscape) {
+            .page.active { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); }
+            .btn-image { width: 55px; height: 55px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. LOCKED INITIAL SCREEN -->
+    <div id="lockedScreen" class="locked-container">
+        <h1 class="locked-title">MERCY AAC</h1>
+        <button id="giantAlertBtn" class="giant-alert-btn">
+            <img src="https://api.iconify.design/noto/police-car-light.svg" alt="Alert">
+        </button>
+        <p class="locked-subtitle">Gusa kuita msaada<br>(Tap to call for help)</p>
+    </div>
+
+    <!-- 2. MAIN APP CONTENT -->
+    <div id="mainAppContent" class="app-content">
+        
+        <!-- TIME MODIFIER BAR -->
+        <div class="modifier-bar">
+            <!-- AUDIO ADDED FOR SASA HIVI -->
+            <button class="btn-mod speakable" data-phrase="Nataka sasa hivi." data-audio="audio/sasahivi.mp3">
+                <img src="https://api.iconify.design/noto/stopwatch.svg" alt="Sasa hivi"> <span>Sasa Hivi</span>
+            </button>
+            <!-- AUDIO ADDED FOR BAADAYE -->
+            <button class="btn-mod speakable" data-phrase="Labda baadaye." data-audio="audio/baadaye.mp3">
+                <img src="https://api.iconify.design/noto/hourglass-done.svg" alt="Baadaye"> <span>Baadaye</span>
+            </button>
+        </div>
+
+        <!-- PERSISTENT CAREGIVER ALERT BUTTON -->
+        <button class="fab-alert trigger-alert-btn">
+            <img src="https://api.iconify.design/noto/police-car-light.svg" alt="Alert">
+        </button>
+
+        <!-- PAGE 1: CORE NEEDS -->
+        <div class="page active" id="page1">
+            <button class="btn bg-choo speakable" data-phrase="Nataka kwenda chooni sasa hivi." data-audio="audio/choo.mp3">
+                <img src="https://api.iconify.design/noto/toilet.svg" alt="Choo" class="btn-image"><span class="btn-label">Choo</span>
+            </button>
+            <button class="btn bg-maji speakable" data-phrase="Nina kiu, nataka maji." data-audio="audio/maji.mp3">
+                <img src="https://api.iconify.design/noto/cup-with-straw.svg" alt="Maji" class="btn-image"><span class="btn-label">Maji</span>
+            </button>
+            <button class="btn bg-chakula speakable" data-phrase="Nina njaa, nataka chakula." data-audio="audio/chakula.mp3">
+                <img src="https://api.iconify.design/noto/fork-and-knife-with-plate.svg" alt="Chakula" class="btn-image"><span class="btn-label">Chakula</span>
+            </button>
+            <button class="btn bg-inatosha speakable" data-phrase="Inatosha." data-audio="audio/inatosha.mp3">
+                <img src="https://api.iconify.design/noto/stop-sign.svg" alt="Inatosha" class="btn-image"><span class="btn-label">Inatosha</span>
+            </button>
+            <button class="btn bg-ndiyo speakable" data-phrase="Ndiyo." data-audio="audio/ndiyo.mp3">
+                <img src="https://api.iconify.design/noto/thumbs-up.svg" alt="Ndiyo" class="btn-image"><span class="btn-label">Ndiyo</span>
+            </button>
+            <button class="btn bg-hapana speakable" data-phrase="Hapana." data-audio="audio/hapana.mp3">
+                <img src="https://api.iconify.design/noto/thumbs-down.svg" alt="Hapana" class="btn-image"><span class="btn-label">Hapana</span>
+            </button>
+            <button class="btn bg-nimechoka speakable" data-phrase="Nimechoka." data-audio="audio/nimechoka.mp3">
+                <img src="https://api.iconify.design/noto/yawning-face.svg" alt="Nimechoka" class="btn-image"><span class="btn-label">Nimechoka</span>
+            </button>
+            <button class="btn bg-asante speakable" data-phrase="Asante." data-audio="audio/asante.mp3">
+                <img src="https://api.iconify.design/noto/folded-hands.svg" alt="Asante" class="btn-image"><span class="btn-label">Asante</span>
+            </button>
+            <button class="btn btn-nav bg-nav-afya" onclick="switchPage('page2')">
+                <img src="https://api.iconify.design/noto/stethoscope.svg" alt="Afya" class="btn-image"><span class="btn-label">Afya ➡️</span>
+            </button>
+        </div>
+
+        <!-- PAGE 2: HEALTH & PAIN -->
+        <div class="page" id="page2">
+            <button class="btn bg-pain speakable" data-phrase="Kichwa kinauma." data-audio="audio/kichwa.mp3">
+                <img src="https://api.iconify.design/noto/face-with-head-bandage.svg" alt="Kichwa" class="btn-image"><span class="btn-label">Kichwa</span>
+            </button>
+            <button class="btn bg-pain speakable" data-phrase="Tumbo linauma au kichefuchefu." data-audio="audio/tumbo.mp3">
+                <img src="https://api.iconify.design/noto/nauseated-face.svg" alt="Tumbo" class="btn-image"><span class="btn-label">Tumbo</span>
+            </button>
+            <button class="btn bg-joto speakable" data-phrase="Nina joto sana." data-audio="audio/joto.mp3">
+                <img src="https://api.iconify.design/noto/hot-face.svg" alt="Joto" class="btn-image"><span class="btn-label">Joto</span>
+            </button>
+            <button class="btn bg-baridi speakable" data-phrase="Nina baridi sana." data-audio="audio/baridi.mp3">
+                <img src="https://api.iconify.design/noto/cold-face.svg" alt="Baridi" class="btn-image"><span class="btn-label">Baridi</span>
+            </button>
+            <button class="btn btn-nav bg-nav-nyuma" onclick="switchPage('page1')">
+                <img src="https://api.iconify.design/noto/left-arrow.svg" alt="Nyuma" class="btn-image"><span class="btn-label">⬅️ Nyuma</span>
+            </button>
+            <button class="btn btn-nav bg-nav-maongezi" onclick="switchPage('page3')">
+                <img src="https://api.iconify.design/noto/speech-balloon.svg" alt="Chat" class="btn-image"><span class="btn-label">Maongezi ➡️</span>
+            </button>
+        </div>
+
+        <!-- PAGE 3: SOCIAL & CHAT -->
+        <div class="page" id="page3">
+            <button class="btn bg-play speakable" data-phrase="Nataka kuangalia TV au kucheza." data-audio="audio/tv.mp3">
+                <img src="https://api.iconify.design/noto/television.svg" alt="TV" class="btn-image"><span class="btn-label">TV / Kucheza</span>
+            </button>
+            <button class="btn btn-nav bg-nav-nyuma" onclick="switchPage('page2')">
+                <img src="https://api.iconify.design/noto/left-arrow.svg" alt="Nyuma" class="btn-image"><span class="btn-label">⬅️ Nyuma</span>
+            </button>
+            <button class="btn btn-nav bg-nav-mwanzo" onclick="switchPage('page1')">
+                <img src="https://api.iconify.design/noto/house.svg" alt="Mwanzo" class="btn-image"><span class="btn-label">Mwanzo 🏠</span>
+            </button>
+        </div>
+
+        <!-- HOLD FOOTER TO OPEN CAREGIVER DASHBOARD -->
+        <div class="attribution" id="caregiverTrigger">MERCY-ACC developed by SEBBY TECH, Tanzania. For support: 0764-997-659.</div>
+    </div> 
+
+    <!-- CAREGIVER DASHBOARD MODAL -->
+    <div id="caregiverOverlay" class="overlay-layer">
+        <div class="dashboard-box">
+            <div class="dash-header">Caregiver Dashboard & Logs</div>
+            <div class="log-container" id="activityLogContainer">
+                <!-- Logs injected here -->
+            </div>
+            <div class="dash-controls">
+                <button class="dash-btn btn-lock" onclick="lockApp()">Done & Lock App</button>
+                <button class="dash-btn btn-close" onclick="document.getElementById('caregiverOverlay').classList.remove('active')">Close Menu (Stay Unlocked)</button>
+                <button class="dash-btn btn-clear" onclick="clearLogs()">Clear Activity Logs</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EMERGENCY ALERT OVERLAY -->
+    <div id="alertOverlay" class="overlay-layer">
+        <img src="https://api.iconify.design/noto/police-car-light.svg" alt="Alert" style="width:150px; margin-bottom:20px; pointer-events:none;">
+        <h2 style="font-size: 3rem; margin-bottom: 5px; font-weight: 900;">Msaada Unahitajika!</h2>
+        <p style="font-size: 1.5rem; margin-bottom: 40px; opacity: 0.85; font-weight: bold;">Caregiver required</p>
+        <button id="acknowledgeBtn" style="padding:20px 40px; font-size:1.8rem; font-weight:900; border-radius:50px; border:none; color:#9f1239; cursor:pointer;">Hold to Acknowledge</button>
+        <div id="progressBarContainer" style="width:250px; height:15px; background:rgba(255,255,255,0.3); border-radius:8px; margin-top:20px; display:none; overflow:hidden;">
+            <div id="progressBar" style="width:0%; height:100%; background:white;"></div>
+        </div>
+    </div>
+
+    <!-- EMERGENCY ALERT AUDIO ELEMENT -->
+    <audio id="alertAudio" src="audio/alert.mp3" loop playsinline preload="auto"></audio>
+
+    <script>
+        if (!('speechSynthesis' in window)) alert("Samahani, kivinjari chako hakiwezi kusoma maneno!");
+
+        let wakeLock = null;
+        let isDebouncing = false; 
+        let speechInitialized = false;
+        let currentAudio = null; 
+
+        // 1. BULLETPROOF IPAD WAKE LOCK LOGIC
+        async function requestWakeLock() {
+            if ('wakeLock' in navigator) {
+                // If the app is minimized or the screen is off, don't ask for a wake lock
+                if (document.visibilityState !== 'visible') return; 
+                
+                try { 
+                    // If we already have the lock, do nothing
+                    if (wakeLock !== null) return; 
+                    
+                    wakeLock = await navigator.wakeLock.request('screen'); 
+                    
+                    // Critical for iPads: Instantly re-acquire lock if Apple OS attempts to drop it
+                    wakeLock.addEventListener('release', () => {
+                        wakeLock = null;
+                        if (document.visibilityState === 'visible') {
+                            requestWakeLock();
+                        }
+                    });
+                } catch (e) {
+                    console.warn(`Wake Lock failed: ${e.message}`);
+                }
+            }
+        }
+
+        function initializeAppEngines() {
+            if (speechInitialized) return;
+            const utter = new SpeechSynthesisUtterance(''); utter.volume = 0; window.speechSynthesis.speak(utter);
+            speechInitialized = true; requestWakeLock();
+            document.removeEventListener('touchstart', initializeAppEngines);
+            document.removeEventListener('click', initializeAppEngines);
+        }
+        document.addEventListener('touchstart', initializeAppEngines, { passive: true });
+        document.addEventListener('click', initializeAppEngines);
+        document.addEventListener('DOMContentLoaded', requestWakeLock);
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                requestWakeLock();
+            }
+        });
+
+        // Ties Wake Lock re-acquisition into every board touch naturally
+        document.addEventListener('touchstart', () => {
+            if (!wakeLock) requestWakeLock();
+        }, { passive: true });
+
+        // 2. Navigation
+        function switchPage(targetPageId) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            setTimeout(() => { document.getElementById(targetPageId).classList.add('active'); }, 10);
+        }
+
+        // 3. Activity Logger
+        function logActivity(phrase) {
+            let logs = JSON.parse(localStorage.getItem('mercy_logs') || '[]');
+            const timeString = new Date().toLocaleTimeString('sw-TZ', { hour: '2-digit', minute: '2-digit', hour12: true });
+            const dateString = new Date().toLocaleDateString('sw-TZ');
+            logs.unshift({ datetime: `${dateString} - ${timeString}`, phrase: phrase });
+            if (logs.length > 50) logs.pop(); 
+            localStorage.setItem('mercy_logs', JSON.stringify(logs));
+        }
+
+        // 4. Caregiver Dashboard Functions
+        function clearLogs() {
+            if (confirm('Una uhakika unataka kufuta kumbukumbu zote? (Clear all logs?)')) {
+                localStorage.removeItem('mercy_logs');
+                document.getElementById('activityLogContainer').innerHTML = "<div class='log-entry'>No activity recorded yet.</div>";
+            }
+        }
+        
+        function lockApp() {
+            document.getElementById('caregiverOverlay').classList.remove('active');
+            document.getElementById('mainAppContent').classList.remove('unlocked');
+            document.getElementById('lockedScreen').style.display = 'flex';
+            logActivity("🔒 App Locked (Returned to Main Screen)");
+        }
+
+        // 5. Speech Logic
+        function playTTS(phrase, btn, reset) {
+            const utter = new SpeechSynthesisUtterance(phrase);
+            utter.lang = 'sw-TZ'; utter.rate = 0.85; 
+            utter.onstart = () => btn.classList.add('speaking');
+            utter.onend = reset; utter.onerror = reset;
+            window.speechSynthesis.speak(utter);
+        }
+
+        function speakPhrase(phrase, btn) {
+            if (isDebouncing) return;
+            isDebouncing = true;
+            logActivity(phrase); 
+
+            window.speechSynthesis.cancel();
+            if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; }
+
+            document.querySelectorAll('.speakable').forEach(b => { b.classList.add('disabled'); b.classList.remove('speaking'); });
+
+            const resetBoard = () => {
+                btn.classList.remove('speaking');
+                setTimeout(() => { document.querySelectorAll('.speakable').forEach(b => b.classList.remove('disabled')); isDebouncing = false; }, 400); 
+            };
+
+            const playMain = () => {
+                const src = btn.getAttribute('data-audio');
+                if (src) {
+                    currentAudio = new Audio(src);
+                    currentAudio.onplay = () => btn.classList.add('speaking');
+                    currentAudio.onended = resetBoard;
+                    currentAudio.onerror = () => playTTS(phrase, btn, resetBoard);
+                    currentAudio.play().catch(() => playTTS(phrase, btn, resetBoard));
+                } else playTTS(phrase, btn, resetBoard); 
+            };
+
+            const ding = new Audio('audio/dingdong.mp3');
+            let proceeded = false;
+            const go = () => { if(!proceeded){ proceeded=true; playMain(); }};
+            ding.onended = go; ding.onerror = go;
+            ding.play().catch(go);
+            
+            setTimeout(() => { if (isDebouncing) resetBoard(); }, 12000);
+        }
+
+        document.querySelectorAll('.speakable').forEach(btn => { 
+            btn.addEventListener('click', (e) => { speakPhrase(e.currentTarget.getAttribute('data-phrase'), e.currentTarget); }); 
+        });
+
+        // 6. EMERGENCY ALERT LOGIC
+        const alertOverlay = document.getElementById('alertOverlay');
+        const alertAudio = document.getElementById('alertAudio');
+        const ackBtn = document.getElementById('acknowledgeBtn');
+        const pBar = document.getElementById('progressBar');
+        const pContainer = document.getElementById('progressBarContainer');
+
+        alertAudio.loop = true; 
+        alertAudio.addEventListener('ended', function() { 
+            this.currentTime = 0; 
+            this.play().catch(()=>{}); 
+        });
+
+        let ackTimer = null, progInt = null, progress = 0;
+        let isHolding = false;
+        let isAlerting = false;
+        let alertTriggerTime = 0;
+
+        const triggerAlert = (e) => {
+            if (e && e.type === 'touchstart') e.preventDefault();
+            
+            if (isAlerting) return; 
+            isAlerting = true;
+            alertTriggerTime = Date.now();
+            
+            logActivity("🚨 EMERGENCY ALERT TRIGGERED");
+            alertOverlay.classList.add('active');
+            alertAudio.currentTime = 0;
+            
+            const p = alertAudio.play();
+            if (p !== undefined) {
+                p.then(() => {
+                    if ('mediaSession' in navigator) {
+                        navigator.mediaSession.metadata = new MediaMetadata({ title: 'Msaada Unahitajika!' });
+                        navigator.mediaSession.setActionHandler('pause', () => alertAudio.play());
+                    }
+                }).catch(()=>{});
+            }
+        };
+
+        document.getElementById('giantAlertBtn').addEventListener('mousedown', triggerAlert);
+        document.getElementById('giantAlertBtn').addEventListener('touchstart', triggerAlert, { passive: false });
+        
+        document.querySelectorAll('.trigger-alert-btn').forEach(btn => {
+            btn.addEventListener('mousedown', triggerAlert);
+            btn.addEventListener('touchstart', triggerAlert, { passive: false });
+        });
+
+        const resetAck = () => {
+            if (!isHolding) return;
+            isHolding = false; clearTimeout(ackTimer); clearInterval(progInt);
+            progress = 0; pBar.style.width = '0%'; pContainer.style.display = 'none';
+            ackBtn.textContent = "Hold to Acknowledge";
+        };
+
+        const startAck = (e) => {
+            if (e.type === 'touchstart') e.preventDefault(); 
+            if (isHolding) return; isHolding = true;
+            pContainer.style.display = 'block'; ackBtn.textContent = "Holding...";
+            
+            progInt = setInterval(() => { progress += 2; pBar.style.width = `${progress}%`; }, 30); 
+            
+            ackTimer = setTimeout(() => {
+                clearInterval(progInt); 
+                isHolding = false;
+                isAlerting = false;
+                
+                const responseTimeSecs = Math.round((Date.now() - alertTriggerTime) / 1000);
+                const mins = Math.floor(responseTimeSecs / 60);
+                const secs = responseTimeSecs % 60;
+                const timeString = mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
+                logActivity(`✅ Msaada umetolewa (Response time: ${timeString})`);
+                
+                if ('mediaSession' in navigator) navigator.mediaSession.setActionHandler('pause', null);
+                alertAudio.pause(); alertAudio.currentTime = 0;
+                alertOverlay.classList.remove('active');
+                progress = 0; pBar.style.width = '0%'; pContainer.style.display = 'none'; ackBtn.textContent = "Hold to Acknowledge";
+                
+                document.getElementById('lockedScreen').style.display = 'none';
+                document.getElementById('mainAppContent').classList.add('unlocked');
+                
+            }, 1500);
+        };
+
+        ackBtn.addEventListener('mousedown', startAck); ackBtn.addEventListener('touchstart', startAck, { passive: false });
+        window.addEventListener('mouseup', resetAck); window.addEventListener('touchend', resetAck); window.addEventListener('touchcancel', resetAck);
+
+        // 7. Caregiver Dashboard (Long Press Footer)
+        const trigger = document.getElementById('caregiverTrigger');
+        let cgTimer = null;
+        const openDash = () => {
+            const container = document.getElementById('activityLogContainer');
+            const logs = JSON.parse(localStorage.getItem('mercy_logs') || '[]');
+            
+            if (logs.length === 0) {
+                container.innerHTML = "<div class='log-entry'>No activity recorded yet.</div>";
+            } else {
+                container.innerHTML = logs.map(l => 
+                    `<div class="log-entry"><span class="log-time">${l.datetime}</span><strong>${l.phrase}</strong></div>`
+                ).join('');
+            }
+            document.getElementById('caregiverOverlay').classList.add('active');
+        };
+
+        trigger.addEventListener('touchstart', (e) => { cgTimer = setTimeout(openDash, 2000); }, { passive: true });
+        trigger.addEventListener('touchend', () => { clearTimeout(cgTimer); });
+        trigger.addEventListener('mousedown', (e) => { cgTimer = setTimeout(openDash, 2000); });
+        trigger.addEventListener('mouseup', () => { clearTimeout(cgTimer); });
+        trigger.addEventListener('mouseleave', () => { clearTimeout(cgTimer); });
+
+        // 8. Housekeeping
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState !== 'visible') { 
+                window.speechSynthesis.cancel(); 
+                if (currentAudio) currentAudio.pause(); 
+            }
+        });
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').then(r => r.update()));
+        }
+    </script>
+</body>
+</html>
