@@ -4,19 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mercey AAC</title>
-    <!-- Makes it look like a native app -->
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="apple-mobile-web-app-title" content="Mercey AAC">
-
-<!-- Links your custom icon -->
-<link rel="apple-touch-icon" href="icon.jpg">
-    <link rel="icon" href="data:,">
     
+    <!-- Consolidated and Fixed iOS Native App Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Mercey AAC">
     <meta name="theme-color" content="#0f172a">
+
+    <!-- Custom Icon & Manifest -->
+    <link rel="apple-touch-icon" href="./icon.jpg">
+    <link rel="icon" href="data:,">
     <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Mercey%20AAC%22%2C%22short_name%22%3A%22AAC%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230f172a%22%2C%22theme_color%22%3A%22%230f172a%22%7D">
 
     <style>
@@ -267,12 +265,10 @@
         
         <!-- TIME MODIFIER BAR -->
         <div class="modifier-bar">
-            <!-- AUDIO ADDED FOR SASA HIVI -->
-            <button class="btn-mod speakable" data-phrase="Nataka sasa hivi." data-audio="audio/sasahivi.mp3">
+            <button class="btn-mod speakable" data-phrase="Nataka sasa hivi." data-audio="./audio/sasahivi.mp3">
                 <img src="https://api.iconify.design/noto/stopwatch.svg" alt="Sasa hivi"> <span>Sasa Hivi</span>
             </button>
-            <!-- AUDIO ADDED FOR BAADAYE -->
-            <button class="btn-mod speakable" data-phrase="Labda baadaye." data-audio="audio/baadaye.mp3">
+            <button class="btn-mod speakable" data-phrase="Labda baadaye." data-audio="./audio/baadaye.mp3">
                 <img src="https://api.iconify.design/noto/hourglass-done.svg" alt="Baadaye"> <span>Baadaye</span>
             </button>
         </div>
@@ -284,28 +280,28 @@
 
         <!-- PAGE 1: CORE NEEDS -->
         <div class="page active" id="page1">
-            <button class="btn bg-choo speakable" data-phrase="Nataka kwenda chooni sasa hivi." data-audio="audio/choo.mp3">
+            <button class="btn bg-choo speakable" data-phrase="Nataka kwenda chooni sasa hivi." data-audio="./audio/choo.mp3">
                 <img src="https://api.iconify.design/noto/toilet.svg" alt="Choo" class="btn-image"><span class="btn-label">Choo</span>
             </button>
-            <button class="btn bg-maji speakable" data-phrase="Nina kiu, nataka maji." data-audio="audio/maji.mp3">
+            <button class="btn bg-maji speakable" data-phrase="Nina kiu, nataka maji." data-audio="./audio/maji.mp3">
                 <img src="https://api.iconify.design/noto/cup-with-straw.svg" alt="Maji" class="btn-image"><span class="btn-label">Maji</span>
             </button>
-            <button class="btn bg-chakula speakable" data-phrase="Nina njaa, nataka chakula." data-audio="audio/chakula.mp3">
+            <button class="btn bg-chakula speakable" data-phrase="Nina njaa, nataka chakula." data-audio="./audio/chakula.mp3">
                 <img src="https://api.iconify.design/noto/fork-and-knife-with-plate.svg" alt="Chakula" class="btn-image"><span class="btn-label">Chakula</span>
             </button>
-            <button class="btn bg-inatosha speakable" data-phrase="Inatosha." data-audio="audio/inatosha.mp3">
+            <button class="btn bg-inatosha speakable" data-phrase="Inatosha." data-audio="./audio/inatosha.mp3">
                 <img src="https://api.iconify.design/noto/stop-sign.svg" alt="Inatosha" class="btn-image"><span class="btn-label">Inatosha</span>
             </button>
-            <button class="btn bg-ndiyo speakable" data-phrase="Ndiyo." data-audio="audio/ndiyo.mp3">
+            <button class="btn bg-ndiyo speakable" data-phrase="Ndiyo." data-audio="./audio/ndiyo.mp3">
                 <img src="https://api.iconify.design/noto/thumbs-up.svg" alt="Ndiyo" class="btn-image"><span class="btn-label">Ndiyo</span>
             </button>
-            <button class="btn bg-hapana speakable" data-phrase="Hapana." data-audio="audio/hapana.mp3">
+            <button class="btn bg-hapana speakable" data-phrase="Hapana." data-audio="./audio/hapana.mp3">
                 <img src="https://api.iconify.design/noto/thumbs-down.svg" alt="Hapana" class="btn-image"><span class="btn-label">Hapana</span>
             </button>
-            <button class="btn bg-nimechoka speakable" data-phrase="Nimechoka." data-audio="audio/nimechoka.mp3">
+            <button class="btn bg-nimechoka speakable" data-phrase="Nimechoka." data-audio="./audio/nimechoka.mp3">
                 <img src="https://api.iconify.design/noto/yawning-face.svg" alt="Nimechoka" class="btn-image"><span class="btn-label">Nimechoka</span>
             </button>
-            <button class="btn bg-asante speakable" data-phrase="Asante." data-audio="audio/asante.mp3">
+            <button class="btn bg-asante speakable" data-phrase="Asante." data-audio="./audio/asante.mp3">
                 <img src="https://api.iconify.design/noto/folded-hands.svg" alt="Asante" class="btn-image"><span class="btn-label">Asante</span>
             </button>
             <button class="btn btn-nav bg-nav-afya" onclick="switchPage('page2')">
@@ -315,16 +311,16 @@
 
         <!-- PAGE 2: HEALTH & PAIN -->
         <div class="page" id="page2">
-            <button class="btn bg-pain speakable" data-phrase="Kichwa kinauma." data-audio="audio/kichwa.mp3">
+            <button class="btn bg-pain speakable" data-phrase="Kichwa kinauma." data-audio="./audio/kichwa.mp3">
                 <img src="https://api.iconify.design/noto/face-with-head-bandage.svg" alt="Kichwa" class="btn-image"><span class="btn-label">Kichwa</span>
             </button>
-            <button class="btn bg-pain speakable" data-phrase="Tumbo linauma au kichefuchefu." data-audio="audio/tumbo.mp3">
+            <button class="btn bg-pain speakable" data-phrase="Tumbo linauma au kichefuchefu." data-audio="./audio/tumbo.mp3">
                 <img src="https://api.iconify.design/noto/nauseated-face.svg" alt="Tumbo" class="btn-image"><span class="btn-label">Tumbo</span>
             </button>
-            <button class="btn bg-joto speakable" data-phrase="Nina joto sana." data-audio="audio/joto.mp3">
+            <button class="btn bg-joto speakable" data-phrase="Nina joto sana." data-audio="./audio/joto.mp3">
                 <img src="https://api.iconify.design/noto/hot-face.svg" alt="Joto" class="btn-image"><span class="btn-label">Joto</span>
             </button>
-            <button class="btn bg-baridi speakable" data-phrase="Nina baridi sana." data-audio="audio/baridi.mp3">
+            <button class="btn bg-baridi speakable" data-phrase="Nina baridi sana." data-audio="./audio/baridi.mp3">
                 <img src="https://api.iconify.design/noto/cold-face.svg" alt="Baridi" class="btn-image"><span class="btn-label">Baridi</span>
             </button>
             <button class="btn btn-nav bg-nav-nyuma" onclick="switchPage('page1')">
@@ -337,7 +333,7 @@
 
         <!-- PAGE 3: SOCIAL & CHAT -->
         <div class="page" id="page3">
-            <button class="btn bg-play speakable" data-phrase="Nataka kuangalia TV au kucheza." data-audio="audio/tv.mp3">
+            <button class="btn bg-play speakable" data-phrase="Nataka kuangalia TV au kucheza." data-audio="./audio/tv.mp3">
                 <img src="https://api.iconify.design/noto/television.svg" alt="TV" class="btn-image"><span class="btn-label">TV / Kucheza</span>
             </button>
             <button class="btn btn-nav bg-nav-nyuma" onclick="switchPage('page2')">
@@ -349,7 +345,7 @@
         </div>
 
         <!-- HOLD FOOTER TO OPEN CAREGIVER DASHBOARD -->
-        <div class="attribution" id="caregiverTrigger">MERCY-ACC developed by SEBBY TECH, Tanzania. For support: 0764-997-659.</div>
+        <div class="attribution" id="caregiverTrigger">MERCY AAC developed by SEBBY TECH, Tanzania. For support: 0764-997-659.</div>
     </div> 
 
     <!-- CAREGIVER DASHBOARD MODAL -->
@@ -379,7 +375,7 @@
     </div>
 
     <!-- EMERGENCY ALERT AUDIO ELEMENT -->
-    <audio id="alertAudio" src="audio/alert.mp3" loop playsinline preload="auto"></audio>
+    <audio id="alertAudio" src="./audio/alert.mp3" loop playsinline preload="auto"></audio>
 
     <script>
         if (!('speechSynthesis' in window)) alert("Samahani, kivinjari chako hakiwezi kusoma maneno!");
@@ -501,7 +497,7 @@
                 } else playTTS(phrase, btn, resetBoard); 
             };
 
-            const ding = new Audio('audio/dingdong.mp3');
+            const ding = new Audio('./audio/dingdong.mp3');
             let proceeded = false;
             const go = () => { if(!proceeded){ proceeded=true; playMain(); }};
             ding.onended = go; ding.onerror = go;
