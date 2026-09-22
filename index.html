@@ -228,9 +228,45 @@
             font-weight: 900; color: white; border-radius: 12px; cursor: pointer; 
         }
         .dash-btn:active { transform: scale(0.97); }
-        .btn-lock { background: #22c55e; } 
+        .btn-lock { background: #22c55e; }
         .btn-close { background: #64748b; }
         .btn-clear { background: #ef4444; }
+        .btn-pin { background: #6366f1; }
+
+        /* Password / PIN Gate */
+        #pinOverlay { background-color: rgba(15, 23, 42, 0.97); }
+        .pin-box {
+            background: white; color: black; border-radius: 20px;
+            width: 100%; max-width: 360px;
+            display: flex; flex-direction: column; align-items: center;
+            padding: 25px 20px; overflow: hidden;
+        }
+        .pin-title { font-size: 1.4rem; font-weight: 900; margin-bottom: 8px; text-align: center; }
+        .pin-error { color: #ef4444; font-weight: bold; font-size: 1rem; height: 1.3rem; margin-bottom: 8px; }
+        .pin-dots { display: flex; gap: 14px; margin-bottom: 20px; }
+        .pin-dot {
+            width: 20px; height: 20px; border-radius: 50%;
+            border: 3px solid #94a3b8; background: transparent;
+            transition: background 0.1s;
+        }
+        .pin-dot.filled { background: #1e293b; border-color: #1e293b; }
+        .pin-dot.shake { animation: pinShake 0.4s; }
+        @keyframes pinShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+        .pin-keypad {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+            width: 100%;
+        }
+        .pin-key {
+            border: none; border-radius: 14px; background: #f1f5f9; color: #111827;
+            font-size: 1.6rem; font-weight: 900; padding: 18px 0; cursor: pointer;
+        }
+        .pin-key:active { background: #e2e8f0; transform: scale(0.95); }
+        .pin-key.pin-cancel { background: #fee2e2; color: #b91c1c; font-size: 1.1rem; }
+        .pin-key.pin-back { background: #e0e7ff; color: #3730a3; font-size: 1.1rem; }
 
         /* General UI Classes */
         .bg-choo { background: var(--c-choo); } .bg-maji { background: var(--c-maji); }
@@ -358,7 +394,33 @@
             <div class="dash-controls">
                 <button class="dash-btn btn-lock" onclick="lockApp()">Done & Lock App</button>
                 <button class="dash-btn btn-close" onclick="document.getElementById('caregiverOverlay').classList.remove('active')">Close Menu (Stay Unlocked)</button>
+                <button class="dash-btn btn-pin" onclick="openPinOverlay('setNew1')">Change Password</button>
                 <button class="dash-btn btn-clear" onclick="clearLogs()">Clear Activity Logs</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PASSWORD GATE MODAL (guards the caregiver dashboard) -->
+    <div id="pinOverlay" class="overlay-layer">
+        <div class="pin-box">
+            <div class="pin-title" id="pinTitle">Enter Password</div>
+            <div class="pin-error" id="pinError"></div>
+            <div class="pin-dots" id="pinDots">
+                <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+            </div>
+            <div class="pin-keypad">
+                <button class="pin-key" onclick="pinDigit('1')">1</button>
+                <button class="pin-key" onclick="pinDigit('2')">2</button>
+                <button class="pin-key" onclick="pinDigit('3')">3</button>
+                <button class="pin-key" onclick="pinDigit('4')">4</button>
+                <button class="pin-key" onclick="pinDigit('5')">5</button>
+                <button class="pin-key" onclick="pinDigit('6')">6</button>
+                <button class="pin-key" onclick="pinDigit('7')">7</button>
+                <button class="pin-key" onclick="pinDigit('8')">8</button>
+                <button class="pin-key" onclick="pinDigit('9')">9</button>
+                <button class="pin-key pin-cancel" onclick="closePinOverlay()">Cancel</button>
+                <button class="pin-key" onclick="pinDigit('0')">0</button>
+                <button class="pin-key pin-back" onclick="pinBackspace()">⌫</button>
             </div>
         </div>
     </div>
@@ -462,6 +524,94 @@
             logActivity("🔒 App Locked (Returned to Main Screen)");
         }
 
+        // 4.5 Password Gate (protects the Caregiver Dashboard / Logs)
+        // Default PIN is 1234 on first use; parents should change it via "Change Password" in the dashboard.
+        const DEFAULT_PIN = '1234';
+        function getStoredPin() {
+            return localStorage.getItem('mercy_pin') || DEFAULT_PIN;
+        }
+
+        const pinOverlay = document.getElementById('pinOverlay');
+        const pinTitle = document.getElementById('pinTitle');
+        const pinError = document.getElementById('pinError');
+        const pinDots = document.querySelectorAll('.pin-dot');
+        let pinMode = 'unlock'; // 'unlock' | 'setNew1' | 'setNew2'
+        let pinBuffer = '';
+        let pinTempNew = '';
+
+        function openPinOverlay(mode) {
+            pinMode = mode;
+            pinBuffer = '';
+            pinTempNew = '';
+            pinError.textContent = '';
+            pinTitle.textContent = mode === 'unlock' ? 'Enter Password' : 'Set New Password';
+            renderPinDots();
+            pinOverlay.classList.add('active');
+        }
+
+        function closePinOverlay() {
+            pinOverlay.classList.remove('active');
+            pinBuffer = ''; pinTempNew = '';
+            renderPinDots();
+        }
+
+        function renderPinDots() {
+            pinDots.forEach((dot, i) => dot.classList.toggle('filled', i < pinBuffer.length));
+        }
+
+        function shakePinDots(message) {
+            pinError.textContent = message;
+            pinDots.forEach(dot => {
+                dot.classList.add('shake');
+                setTimeout(() => dot.classList.remove('shake'), 400);
+            });
+        }
+
+        function pinDigit(d) {
+            if (pinBuffer.length >= 4) return;
+            pinBuffer += d;
+            renderPinDots();
+            if (pinBuffer.length === 4) setTimeout(submitPin, 150);
+        }
+
+        function pinBackspace() {
+            pinBuffer = pinBuffer.slice(0, -1);
+            renderPinDots();
+        }
+
+        function submitPin() {
+            if (pinMode === 'unlock') {
+                if (pinBuffer === getStoredPin()) {
+                    closePinOverlay();
+                    openDash();
+                } else {
+                    shakePinDots('Nenosiri sio sahihi (Wrong password)');
+                    pinBuffer = '';
+                    setTimeout(renderPinDots, 50);
+                }
+            } else if (pinMode === 'setNew1') {
+                pinTempNew = pinBuffer;
+                pinBuffer = '';
+                pinMode = 'setNew2';
+                pinError.textContent = '';
+                pinTitle.textContent = 'Confirm New Password';
+                renderPinDots();
+            } else if (pinMode === 'setNew2') {
+                if (pinBuffer === pinTempNew) {
+                    localStorage.setItem('mercy_pin', pinBuffer);
+                    closePinOverlay();
+                    alert('Nenosiri limebadilishwa (Password updated)');
+                } else {
+                    shakePinDots('Haiendani, jaribu tena (Did not match, try again)');
+                    pinMode = 'setNew1';
+                    pinTempNew = '';
+                    pinBuffer = '';
+                    pinTitle.textContent = 'Set New Password';
+                    setTimeout(renderPinDots, 50);
+                }
+            }
+        }
+
         // 5. Speech Logic
         function playTTS(phrase, btn, reset) {
             const utter = new SpeechSynthesisUtterance(phrase);
@@ -497,17 +647,18 @@
                 } else playTTS(phrase, btn, resetBoard); 
             };
 
-            const ding = new Audio('./audio/dingdong.mp3');
-            let proceeded = false;
-            const go = () => { if(!proceeded){ proceeded=true; playMain(); }};
-            ding.onended = go; ding.onerror = go;
-            ding.play().catch(go);
-            
+            playMain();
+
             setTimeout(() => { if (isDebouncing) resetBoard(); }, 12000);
         }
 
-        document.querySelectorAll('.speakable').forEach(btn => { 
-            btn.addEventListener('click', (e) => { speakPhrase(e.currentTarget.getAttribute('data-phrase'), e.currentTarget); }); 
+        document.querySelectorAll('.speakable').forEach(btn => {
+            const trigger = (e) => {
+                if (e.type === 'touchstart') e.preventDefault();
+                speakPhrase(btn.getAttribute('data-phrase'), btn);
+            };
+            btn.addEventListener('mousedown', trigger);
+            btn.addEventListener('touchstart', trigger, { passive: false });
         });
 
         // 6. EMERGENCY ALERT LOGIC
@@ -614,9 +765,10 @@
             document.getElementById('caregiverOverlay').classList.add('active');
         };
 
-        trigger.addEventListener('touchstart', (e) => { cgTimer = setTimeout(openDash, 2000); }, { passive: true });
+        const askForPin = () => openPinOverlay('unlock');
+        trigger.addEventListener('touchstart', (e) => { cgTimer = setTimeout(askForPin, 2000); }, { passive: true });
         trigger.addEventListener('touchend', () => { clearTimeout(cgTimer); });
-        trigger.addEventListener('mousedown', (e) => { cgTimer = setTimeout(openDash, 2000); });
+        trigger.addEventListener('mousedown', (e) => { cgTimer = setTimeout(askForPin, 2000); });
         trigger.addEventListener('mouseup', () => { clearTimeout(cgTimer); });
         trigger.addEventListener('mouseleave', () => { clearTimeout(cgTimer); });
 
@@ -629,6 +781,14 @@
         });
 
         if ('serviceWorker' in navigator) {
+            // Auto-reload once when a new service worker takes over, so an already-open
+            // tablet picks up app updates (new CACHE_NAME in sw.js) without needing a manual force-close.
+            let swRefreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (swRefreshing) return;
+                swRefreshing = true;
+                window.location.reload();
+            });
             window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').then(r => r.update()));
         }
     </script>

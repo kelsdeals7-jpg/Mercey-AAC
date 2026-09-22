@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mercey-aac-v1';
+const CACHE_NAME = 'mercey-aac-v2';
 
 // All local assets that must be available immediately offline
 const PRECACHE_ASSETS = [
@@ -13,7 +13,13 @@ const PRECACHE_ASSETS = [
     './audio/nimechoka.mp3',
     './audio/asante.mp3',
     './audio/joto.mp3',
-    './audio/baridi.mp3'
+    './audio/baridi.mp3',
+    './audio/sasahivi.mp3',
+    './audio/baadaye.mp3',
+    './audio/kichwa.mp3',
+    './audio/tumbo.mp3',
+    './audio/tv.mp3',
+    './audio/alert.mp3'
 ];
 
 // Install event: Pre-cache local HTML and MP3 files
